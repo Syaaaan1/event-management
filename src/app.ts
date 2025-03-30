@@ -1,11 +1,16 @@
 const express = require('express');
+import { Router } from 'express';
 import initSequelize from "./config/database";
 import {initUserModel} from "./models/User";
 import {initEventModel} from "./models/Event";
 import initRegistrationModel from "./models/Registration";
+import { registerUser, loginUser } from './controllers/authController';
 
 const app = express();
+const router = Router();
 const serverPORT = 5000;
+
+app.use(express.json());
 
 async function startServer() {
     try {
@@ -30,5 +35,9 @@ async function startServer() {
         process.exit(1);
     }
 }
+
+router.post('/register', registerUser);
+router.post('/login', loginUser);
+
 
 startServer();
