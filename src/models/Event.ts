@@ -5,6 +5,8 @@ class Event extends Model {
     public title!: string;
     public description!: string;
     public date!: Date;
+    public location! : string;
+    public maxParticipants! : number;
 }
 
 function initEventModel(sequelize: Sequelize) {
@@ -27,6 +29,14 @@ function initEventModel(sequelize: Sequelize) {
                 type: DataTypes.DATE,
                 allowNull: false,
             },
+            location : {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            maxParticipants: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+            }
         },
         {
             sequelize,
