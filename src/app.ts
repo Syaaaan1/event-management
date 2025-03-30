@@ -1,29 +1,41 @@
-const express = require('express');
+import express from 'express';
 import { Router } from 'express';
 import initSequelize from "./config/database";
-import {initUserModel} from "./models/User";
-import {initEventModel} from "./models/Event";
-import initRegistrationModel from "./models/Registration";
+import { initUserModel } from "./models/User";
+import { initEventModel } from "./models/Event";
 import { registerUser, loginUser } from './controllers/authController';
+import eventRoutes from "./routes/eventRoutes";
+import participantRoutes from './routes/participantRoutes';
+import { initParticipantModel } from './models/Participants';
+import { Event } from './models/Event';
+import { Participant } from './models/Participants';
 
 const app = express();
 const router = Router();
 const serverPORT = 5000;
 
 app.use(express.json());
+app.use("/events", eventRoutes);
+app.use("/participants", participantRoutes);
+
+app.post('/register', registerUser);
+app.post('/login', loginUser);
 
 async function startServer() {
     try {
-        // підкл до бд
+        // підключення до БД
         const sequelize = await initSequelize();
         
-        // мод передаючи з єднання 
-        const User = await initUserModel(sequelize);
-        const Event = await initEventModel(sequelize);
-        const Registration = initRegistrationModel(sequelize);
+        // ініц моделей
+        initUserModel(sequelize);
+        initEventModel(sequelize);
+        initParticipantModel(sequelize);
 
-        
-        // синхронізація моделей з бд
+        //асоціації
+        Event.hasMany(Participant, { foreignKey: 'eventId' });
+        Participant.belongsTo(Event, { foreignKey: 'eventId', as: 'event' });
+
+        // синхронізація
         await sequelize.sync({ force: false });
         console.log("Database synced");
 
@@ -35,9 +47,5 @@ async function startServer() {
         process.exit(1);
     }
 }
-
-router.post('/register', registerUser);
-router.post('/login', loginUser);
-
 
 startServer();

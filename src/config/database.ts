@@ -24,7 +24,7 @@ async function createDatabase() {
         await connection.end();
         return true;
     } catch (error) {
-        console.error("❌ Error creating database:", error);
+        console.error("Error creating database:", error);
         return false;
     }
 }
